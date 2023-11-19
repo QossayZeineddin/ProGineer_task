@@ -64,7 +64,8 @@ if __name__ == "__main__":
     try:
         column_number = int(sys.argv[2])
     except ValueError:
-        print("Error: Could not convert the string to an integer.")
+        exit("Error: Could not convert the string to an integer.")
+
     # Specify the output folder name
     output_folder = "out_files"
     if not os.path.exists(output_folder):
