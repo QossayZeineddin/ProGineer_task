@@ -71,3 +71,5 @@ if __name__ == "__main__":
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
     split_and_write_by_column(input_file, column_number, output_folder)
+    # To run the code write in terminal :-
+    # 'python main.py datafile.csv 5'
