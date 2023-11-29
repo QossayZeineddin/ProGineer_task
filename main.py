@@ -14,7 +14,7 @@ def get_valid_file_name():
         input_file = f"{input_file}.csv"
 
         if not os.path.exists(input_file):
-            print("File Not Found! Please enter a valid file name.")
+            print(f"Error: File '{input_file}' not found. Please enter a valid file name.")
         else:
             return input_file
 
@@ -39,10 +39,26 @@ def parse_header(lines):
     return header_section, data_start_line if header_end_line > header_start_line and data_start_line > header_end_line else None
 
 
+def process_rows(lines, DATA_START_LINE, number_of_columns, column_number, column_names):
+    data_dict = defaultdict(list)
+
+    for i, line in enumerate(lines[DATA_START_LINE:], start=DATA_START_LINE):
+        # Remove the empty line
+        if line.strip():
+            row = [value if value and value != ' ' else "NA" for value in line.strip().split(DELIMITER)]
+
+            # Check if the row length is correct
+            if len(row) == number_of_columns:
+                key = row[column_number - 1]
+
+                # Remove duplicate lines
+                if row not in data_dict[key]:
+                    data_dict[key].append(row)
+
+    return data_dict
 
 
-
-def write_files_to_outfolder(data_dict, column_names):
+def write_files_to_outfolder(data_dict, column_names, output_folder):
     # Write the data from a dictionary to its correct file each file 300 row
     for key, rows in data_dict.items():
         output_file_number = 1
@@ -73,21 +89,8 @@ def split_and_write_by_column(input_file, column_number, output_folder):
         raise IndexError(
             f"Error: Column number {column_number} is out of range. Available columns: {len(column_names)}")
 
-    data_dict = defaultdict(list)
-
-    for line in lines[DATA_START_LINE:]:
-        # Remove the empty line
-        if line.strip():
-            row = [value if value and value != ' ' else "NA" for value in line.strip().split(DELIMITER)]
-
-            # Check if the row length is correct
-            if len(row) == number_of_columns:
-                key = row[column_number - 1]
-
-                # Remove duplicate lines
-                if row not in data_dict[key]:
-                    data_dict[key].append(row)
-    write_files_to_outfolder(data_dict, column_names)
+    data_dict = process_rows(lines, DATA_START_LINE, number_of_columns, column_number, column_names)
+    write_files_to_outfolder(data_dict, column_names, output_folder)
     print("Done")
 
 
